@@ -37,8 +37,6 @@ export default class GBifference extends EventEmitter {
       occurrenceId: occurrenceId || sourceOccurrence.occurrenceId
     })
 
-    this.emit('start', this.occurrenceObjectTable)
-
     if (GBIFOccurrence) {
       occurrence.original = await GBIFService.getOccurrenceFragment(GBIFOccurrence.key)
       occurrence.interpreted = GBIFOccurrence
@@ -46,10 +44,7 @@ export default class GBifference extends EventEmitter {
 
     this.occurrence = occurrence
 
-    if (
-      occurrence.original && 
-      occurrence.interpreted
-    ) {
+    if (occurrence.original && occurrence.interpreted) {
       this.remark = getRemark(occurrence.original, occurrence.interpreted)
     }
 
@@ -83,14 +78,14 @@ export default class GBifference extends EventEmitter {
   }
 
   get occurrenceObjectTable (): ITable {
-    const occurrenceTypes = Object.keys(this.occurrence)
+    const occurrenceTypes: Array<string> = Object.keys(this.occurrence)
     const table: ITable = {
       dwcAttributes: {},
       headers: [...occurrenceTypes, 'remark']
     }
 
     OCCURRENCE_ATTRIBUTES.forEach((attr: string) => {
-      const attrObject = Object.fromEntries(occurrenceTypes.map(key => [key, this.occurrence[key][attr] || '']))
+      const attrObject = Object.fromEntries(occurrenceTypes.map((key: string) => [key, this.occurrence[key][attr] || '']))
 
       table.dwcAttributes[attr] = {
         ...attrObject,
