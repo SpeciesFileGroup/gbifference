@@ -7,5 +7,6 @@ export interface ITable {
     source?: TOccurrence
     remark?: string
   },
-  headers: Array<string>
+  headers: Array<string>,
+  inSync: boolean
 }

@@ -42,7 +42,10 @@ export default class GBifference extends EventEmitter {
       occurrence.interpreted = GBIFOccurrence
     }
 
-    this.occurrence = occurrence
+    this.occurrence = {
+      source: sourceOccurrence,
+      ...occurrence
+    }
 
     if (occurrence.original && occurrence.interpreted) {
       this.remark = getRemark(occurrence.original, occurrence.interpreted)
@@ -81,7 +84,8 @@ export default class GBifference extends EventEmitter {
     const occurrenceTypes: Array<string> = Object.keys(this.occurrence)
     const table: ITable = {
       dwcAttributes: {},
-      headers: [...occurrenceTypes, 'remark']
+      headers: [...occurrenceTypes, 'remark'],
+      inSync: OCCURRENCE_ATTRIBUTES.every(attr => this.occurrence.source[attr] == this.occurrence.original[attr])
     }
 
     OCCURRENCE_ATTRIBUTES.forEach((attr: string) => {
@@ -89,7 +93,7 @@ export default class GBifference extends EventEmitter {
 
       table.dwcAttributes[attr] = {
         ...attrObject,
-        remark: this.remark[attr]
+        remark: this.remark[attr] || ''
       }
     })
 
