@@ -1,9 +1,9 @@
 import { TOccurrence } from "@/types"
 
 export interface ITable {
-  dwcRecords: { [key: string]: ITableRow },
+  dwcRecords: { [key: string]: TOccurrence },
+  dwcTerms: Array<string>
   remarks: { [ key: string]: string },
-  headers: Array<string>,
   inSync: boolean
 }
 

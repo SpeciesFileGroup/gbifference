@@ -17,12 +17,12 @@
     </thead>
     <tbody>
       <tr 
-        v-for="(list, term) in occurrences.dwcRecords"
+        v-for="term in occurrences.dwcTerms"
         :key="term"
       >
         <td>{{ term }}</td>
         <template
-          v-for="(value, column) in list"
+          v-for="(record, column) in occurrences.dwcRecords"
           :key="column"
         >
           <td
@@ -30,11 +30,12 @@
             @click="emit('cell:click', { 
               event: $event,
               term,
-              value,
-              row: list
+              record,
+              dwcRecord: record,
+              source: column
             })"
           >
-            {{ value }}
+            {{ record[term] }}
           </td>
         </template>
         <td>{{ occurrences.remarks[term] }}</td>
@@ -46,7 +47,7 @@
 <script setup lang="ts">
 import { ref, computed, ComputedRef } from 'vue'
 import { ITable, ISource } from '@/interfaces'
-import GBifference from '@/gbifference'
+import gbifferenceFunc from '@/gbifferenceFunc'
 
 interface Props {
   occurrenceId?: string
@@ -61,21 +62,25 @@ enum OccurrenceRecord {
 }
 
 const props = defineProps<Props>()
-const instance = new GBifference(props)
 const occurrences = ref<ITable>({
   dwcRecords: {},
-  headers: [],
+  dwcTerms: [],
   inSync: false,
   remarks: {}
 })
 
 const headers: ComputedRef<string[]> = computed(() => {
-  return occurrences.value.inSync
-    ? occurrences.value.headers.filter(header => header !== OccurrenceRecord.Original && header !== OccurrenceRecord.Source)
-    : occurrences.value.headers
+  const { dwcRecords, inSync } = occurrences.value
+  const keys = Object.keys(dwcRecords)
+
+  return inSync
+    ? keys.filter(header => header !== OccurrenceRecord.Original && header !== OccurrenceRecord.Source)
+    : keys
 })
 
 const emit = defineEmits(['cell:click'])
 
-instance.on('complete', (e: ITable) => occurrences.value = e)
+gbifferenceFunc(props).then(data => {
+  occurrences.value = data
+})
 </script>
