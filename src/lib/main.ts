@@ -1,3 +1,4 @@
+import { TOccurrence } from '@/types';
 import { IConfiguration } from "@/interfaces"
 import GBifference from "@/gbifference"
 
@@ -15,13 +16,24 @@ function autoDiscover (): void {
   discoverGbifference()
 }
 
+function parseDwcObject (dwcObjet: any): TOccurrence {
+  try {
+    const json = JSON.parse(dwcObjet)
+
+    return json
+  } catch(e) {
+    throw('Invalid dwcObject')
+  }
+}
+
+
 function parseElementOptions (element: HTMLElement): IConfiguration {
   return {
-    occurrenceId: element.getAttribute('data-occurrence-id'),
-    datasetKey: element.getAttribute('data-datasetkey'),
+    occurrenceId: element.getAttribute('data-occurrence-id') || undefined,
+    datasetKey: element.getAttribute('data-datasetkey') || undefined,
     source: {
       url: element.getAttribute('data-source-url') || undefined,
-      dwcObject: JSON.parse(element.getAttribute('data-dwc-object')) || undefined
+      dwcObject: parseDwcObject(element.getAttribute('data-dwc-object'))
     }
   }
 }

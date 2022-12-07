@@ -1,2 +1,2 @@
 export * from './differenceTypes'
-export * from './occurrenceAttributes'
+export * from './dwcTerm'

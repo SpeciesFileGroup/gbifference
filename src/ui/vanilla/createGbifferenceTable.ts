@@ -1,10 +1,15 @@
 import { ITable } from "@/interfaces"
 
-export function createOccurrenceTable (element: HTMLElement, { headers, dwcAttributes }: ITable) {
+export function createGbifferenceTable (instance) {
+
+  const element = instance.element
+  const { headers, dwcAttributes } = instance.occurrenceObjectTable
 
   function renderTable (element: HTMLElement) {
     const tableElement = document.createElement('table')
     const tbodyElement = document.createElement('tbody')
+
+    tableElement.classList.add('gbifference-table')
 
     tableElement.appendChild(createHeader(['attributes', ...headers]))
     tableElement.appendChild(tbodyElement)
@@ -27,6 +32,7 @@ export function createOccurrenceTable (element: HTMLElement, { headers, dwcAttri
     data.forEach((value: string) => {
       const cellElement = document.createElement('td')
 
+      cellElement.addEventListener('click', (e) => { instance.emit('click', { event: e, row: data }) })
       cellElement.innerHTML = value
       rowElement.appendChild(cellElement)
     })

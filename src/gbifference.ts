@@ -1,22 +1,23 @@
-import { IConfiguration, ISource, IOccurrences, ITable } from "./interfaces"
-import { TOccurrence, TRemark } from './types'
-import { OCCURRENCE_ATTRIBUTES } from "./constants/occurrenceAttributes"
-import { makeGetRequest, EventEmitter, createOccurrenceTable } from './utils'
+import { IConfiguration, ISource, IOccurrences, ITable, ITableRow, IGbifOccurrence } from "./interfaces"
+import { TOccurrence, TRemark } from '@/types'
+import { DWC_TERMS } from "@/constants"
+import { makeGetRequest, EventEmitter } from '@/utils'
+import { createGbifferenceTable } from '@/ui/vanilla/createGbifferenceTable'
 import { getRemark } from "@/utils/remark"
 import GBIFService from '@/services/gbif'
 
 export default class GBifference extends EventEmitter {
-  occurrence: IOccurrences = {}
-  remark: TRemark = {}
+  remarks: TRemark = {}
   element: HTMLElement | undefined
+  occurrence: IOccurrences = {
+    source: {},
+    original: {},
+    interpreted: {}
+  }
 
   constructor (opt: IConfiguration) {
     super()
     const { occurrenceId, source, element } = opt
-
-    if (!occurrenceId) {
-      throw('No occurrenceId')
-    }
 
     if (!occurrenceId || (!source.dwcObject && !source.url)) {
       throw('No source provided')
@@ -30,29 +31,26 @@ export default class GBifference extends EventEmitter {
   }
 
   private async init ({ datasetKey, occurrenceId, source }: IConfiguration) {
-    const occurrence: IOccurrences = {}
     const sourceOccurrence: TOccurrence = await this.getOccurrenceFromSource(source)
-    const GBIFOccurrence = await this.getGBIFOccurrence({
+
+    if (!occurrenceId && !sourceOccurrence.occurrenceId) {
+      throw('No occurrenceId')
+    }
+
+    const gbifOccurrence: IGbifOccurrence = await this.getGBIFOccurrence({
       datasetKey,
-      occurrenceId: occurrenceId || sourceOccurrence.occurrenceId
+      occurrenceId: occurrenceId || sourceOccurrence.occurrenceId as string
     })
 
-    if (GBIFOccurrence) {
-      occurrence.original = await GBIFService.getOccurrenceFragment(GBIFOccurrence.key)
-      occurrence.interpreted = GBIFOccurrence
+    if (gbifOccurrence) {
+      this.occurrence.original = await GBIFService.getOccurrenceFragment(gbifOccurrence.key)
+      this.occurrence.interpreted = gbifOccurrence
     }
 
-    this.occurrence = {
-      source: sourceOccurrence,
-      ...occurrence
-    }
-
-    if (occurrence.original && occurrence.interpreted) {
-      this.remark = getRemark(occurrence.original, occurrence.interpreted)
-    }
+    this.occurrence.source = sourceOccurrence
 
     if (this.element) {
-      createOccurrenceTable(this.element, this.occurrenceObjectTable)
+      createGbifferenceTable(this)
     }
 
     this.emit('complete', this.occurrenceObjectTable)
@@ -63,7 +61,7 @@ export default class GBifference extends EventEmitter {
       return GBIFService.getOccurrenceByDataset({ datasetKey, occurrenceId })
     }
 
-    return (await GBIFService.searchOccurrence({ occurrenceId })).results[0]
+    return (await GBIFService.searchOccurrence({ occurrenceId }))?.results[0]
   }
 
   private getOccurrenceFromSource (source: ISource) {
@@ -81,20 +79,18 @@ export default class GBifference extends EventEmitter {
   }
 
   get occurrenceObjectTable (): ITable {
-    const occurrenceTypes: Array<string> = Object.keys(this.occurrence)
+    const occurrenceTypes: Array<string> = Object.keys(this.occurrence).filter((key: string) => !!Object.keys(this.occurrence[key as keyof IOccurrences]).length)
     const table: ITable = {
-      dwcAttributes: {},
-      headers: [...occurrenceTypes, 'remark'],
-      inSync: OCCURRENCE_ATTRIBUTES.every(attr => this.occurrence.source[attr] == this.occurrence.original[attr])
+      dwcRecords: {},
+      headers: [...occurrenceTypes],
+      inSync: DWC_TERMS.every((term: string) => this.occurrence.source[term] == this.occurrence.original[term]),
+      remarks: getRemark(this.occurrence.original, this.occurrence.interpreted)
     }
 
-    OCCURRENCE_ATTRIBUTES.forEach((attr: string) => {
-      const attrObject = Object.fromEntries(occurrenceTypes.map((key: string) => [key, this.occurrence[key][attr] || '']))
+    DWC_TERMS.forEach((term: string) => {
+      const attrObject: ITableRow = Object.fromEntries(occurrenceTypes.map((key: string) => [key, this.occurrence[key as keyof IOccurrences][term] || '']))
 
-      table.dwcAttributes[attr] = {
-        ...attrObject,
-        remark: this.remark[attr] || ''
-      }
+      table.dwcRecords[term] = attrObject
     })
 
     return table

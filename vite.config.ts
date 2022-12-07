@@ -2,6 +2,7 @@
 
 import { fileURLToPath, URL } from 'url'
 import { defineConfig } from 'vitest/config'
+import vue from '@vitejs/plugin-vue'
 import path from "path"
 
 // https://vitejs.dev/config/
@@ -11,6 +12,8 @@ export default defineConfig({
       '@': fileURLToPath(new URL("./src", import.meta.url))
     },
   },
+
+  plugins: [vue()],
 
   test: {
     globals: true

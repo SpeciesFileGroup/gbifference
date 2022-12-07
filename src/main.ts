@@ -1,4 +1,7 @@
 import GBifference from './gbifference'
+import { createApp } from 'vue'
+import VueGbifference from '@/ui/vue/VueGbifference.vue'
+import '@/assets/stylesheets/style.css'
 
 const DWC = {
   "associatedMedia": null,
@@ -56,7 +59,7 @@ const DWC = {
   "year": "2020"
 }
 
-const instance = new GBifference({
+/* const instance = new GBifference({
   element: '#app',
   occurrenceId: 'urn:uuid:8f3fe604-8e36-4841-8c94-8e1a89b38273',
   source: {
@@ -65,3 +68,13 @@ const instance = new GBifference({
 })
 
 instance.on('complete', (e) =>  console.log(e))
+instance.on('click', (e) => console.log(e)) */
+
+const app = createApp(VueGbifference, {
+  occurrenceId: 'urn:uuid:8f3fe604-8e36-4841-8c94-8e1a89b38273',
+  source: {
+    dwcObject: DWC
+  }
+})
+
+app.mount('#app')

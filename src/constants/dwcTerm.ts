@@ -1,4 +1,4 @@
-export const OCCURRENCE_ATTRIBUTES: Array<string> = [
+export const DWC_TERMS: Array<string> = [
   "scientificName",
   "acceptedScientificName",
   "kingdom",
@@ -33,4 +33,5 @@ export const OCCURRENCE_ATTRIBUTES: Array<string> = [
   "county",
   "locality",
   "collectionCode",
+  "occurrenceID"
 ]

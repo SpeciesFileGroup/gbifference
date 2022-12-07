@@ -5,16 +5,23 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest"
   },
   "devDependencies": {
+    "@testing-library/vue": "^6.6.1",
     "@typescript-eslint/eslint-plugin": "^5.44.0",
     "@typescript-eslint/parser": "^5.44.0",
+    "@vitejs/plugin-vue": "^3.2.0",
+    "@vue/eslint-config-typescript": "^11.0.2",
     "eslint": "^8.28.0",
     "typescript": "^4.9.3",
     "vite": "^3.2.4",
-    "vitest": "^0.25.3"
+    "vitest": "^0.25.3",
+    "vue-tsc": "^1.0.11"
+  },
+  "dependencies": {
+    "vue": "^3.2.45"
   }
 }
