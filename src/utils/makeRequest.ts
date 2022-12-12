@@ -1,6 +1,6 @@
 import { IRequestOptions } from './../interfaces'
 
-function handleError(response) {
+function handleError(response: any) {
   if (!response.ok) {
     const err = response.statusText || response
     

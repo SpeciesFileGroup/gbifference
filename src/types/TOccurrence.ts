@@ -1,1 +1,1 @@
-export type TOccurrence = { [attribute: string]: string | number | null }
+export type TOccurrence = string | number | null

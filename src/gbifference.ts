@@ -1,22 +1,23 @@
-import { TRemark } from './types/TRemark';
 import { 
   IConfiguration,
   ISource,
+  IOccurrence,
   IOccurrences,
-  ITable,
-  IGbifOccurrence
+  IGbifferenceData,
+  IGbifOccurrence,
+  IDwcRecords,
+  IRemark
 } from "./interfaces"
-import { TOccurrence } from '@/types'
 import { makeGetRequest } from '@/utils'
 import { getRemark } from "@/utils/remark"
 import GBIFService from '@/services/gbif'
 
-async function getGBIFOccurrence ({ datasetKey, occurrenceId }: { datasetKey?: string, occurrenceId: string }) {
+async function getGBIFOccurrence ({ datasetKey, occurrenceId }: { datasetKey?: string, occurrenceId: string }): Promise<IGbifOccurrence> {
   if (datasetKey) {
     return GBIFService.getOccurrenceByDataset({ datasetKey, occurrenceId })
   }
 
-  return (await GBIFService.searchOccurrence({ occurrenceId }))?.results[0]
+  return (await GBIFService.searchOccurrence({ occurrenceId })).results[0]
 }
 
 function getOccurrenceFromSource (source: ISource) {
@@ -28,18 +29,23 @@ function getOccurrenceFromSource (source: ISource) {
   return makeGetRequest(url, parameters)
 }
 
-function getDwcTerms(dwcObjs: Array<TOccurrence>): Array<string> {
-  const keys: Array<string> = []
+function getDwcTermsFromOccurrences(dwcObjs: IOccurrence[]): string[] {
+  let terms: string[] = []
 
-  dwcObjs.forEach((obj: TOccurrence) => {
-    keys.concat(Object.keys(obj))
+  dwcObjs.forEach((obj: IOccurrence) => {
+    terms = [
+      ...terms,
+      ...Object.keys(obj)
+    ]
   })
 
-  return [...new Set(keys)]
+  terms.sort()
+
+  return [...new Set(terms)]
 }
 
 export default function (opt: IConfiguration) {
-  const occurrence: IOccurrences = {
+  const occurrences: IOccurrences = {
     source: {},
     original: {},
     interpreted: {}
@@ -49,8 +55,8 @@ export default function (opt: IConfiguration) {
     throw('No source provided')
   }
 
-  async function init ({ datasetKey, occurrenceId, source }: IConfiguration): Promise<ITable> {
-    const sourceOccurrence: TOccurrence = await getOccurrenceFromSource(source)
+  async function init ({ datasetKey, occurrenceId, source }: IConfiguration): Promise<IGbifferenceData> {
+    const sourceOccurrence: IOccurrence = await getOccurrenceFromSource(source)
 
     if (!opt.occurrenceId && !sourceOccurrence.occurrenceId) {
       throw('No occurrenceId')
@@ -62,23 +68,23 @@ export default function (opt: IConfiguration) {
     })
 
     if (gbifOccurrence) {
-      occurrence.original = await GBIFService.getOccurrenceFragment(gbifOccurrence.key)
-      occurrence.interpreted = gbifOccurrence
+      occurrences.original = await GBIFService.getOccurrenceFragment(gbifOccurrence.key)
+      occurrences.interpreted = gbifOccurrence
     }
 
-    occurrence.source = sourceOccurrence
+    occurrences.source = sourceOccurrence
 
     return makeOccurrenceTableObject()
   }
 
-  function makeOccurrenceTableObject (): ITable {
-    const dwcRecords: { [dwcRecord: string]: TOccurrence } = {}
-    const dwcTerms: Array<string> = getDwcTerms([occurrence.source, occurrence.original])
-    const inSync: boolean = dwcTerms.every((term: string) => occurrence.source[term] == occurrence.original[term])
-    const remarks: TRemark = getRemark(occurrence.original, occurrence.interpreted)
+  function makeOccurrenceTableObject (): IGbifferenceData {
+    const dwcRecords: IDwcRecords = {}
+    const dwcTerms: string[] = getDwcTermsFromOccurrences([occurrences.source, occurrences.original])
+    const inSync: boolean = dwcTerms.every((term: string) => occurrences.source[term] == occurrences.original[term])
+    const remarks: IRemark = getRemark(occurrences.original, occurrences.interpreted, dwcTerms)
 
-    for (const key in occurrence) {
-      const record = occurrence[key as keyof IOccurrences]
+    for (const key in occurrences) {
+      const record: IOccurrence = occurrences[key as keyof IOccurrences]
 
       if (Object.keys(record).length) {
         dwcRecords[key] = record

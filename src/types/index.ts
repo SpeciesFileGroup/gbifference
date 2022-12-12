@@ -1,2 +1,3 @@
 export * from './TOccurrence'
-export * from './TRemark'
+export * from '../interfaces/IRemark'
+export * from './TTableRow'

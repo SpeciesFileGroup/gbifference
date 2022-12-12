@@ -1,6 +1,4 @@
-import GBifference from './gbifference'
-import { createApp } from 'vue'
-import VueGbifference from '@/ui/vue/VueGbifference.vue'
+import { TableGbifference } from './ui/TableGbifference'
 import '@/assets/stylesheets/style.css'
 
 const DWC = {
@@ -59,11 +57,11 @@ const DWC = {
   "year": "2020"
 }
 
-const app = createApp(VueGbifference, {
+const table = new TableGbifference('#app', {
   occurrenceId: 'urn:uuid:8f3fe604-8e36-4841-8c94-8e1a89b38273',
   source: {
     dwcObject: DWC
   }
-})
-
-app.mount('#app')
+}) 
+  
+table.on('click:cell', e => console.log(e))

@@ -1,4 +1,4 @@
-import { TOccurrence } from './../types/TOccurrence';
+import { IOccurrence } from '@/interfaces'
 
 export interface IConfiguration {
   element?: HTMLElement | string
@@ -11,5 +11,5 @@ export interface ISource {
   url?: string,
   parameters?: { [key: string]: string },
   headers?: { [key: string]: string }
-  dwcObject?: TOccurrence 
+  dwcObject?: IOccurrence 
 }

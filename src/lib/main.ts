@@ -1,13 +1,14 @@
-import { TOccurrence } from '@/types';
-import { IConfiguration } from "@/interfaces"
-import GBifference from "@/gbifference"
+import { TableGbifference } from '@/ui/TableGbifference'
+import { IConfiguration, IOccurrence } from "@/interfaces"
+import gbifference from "@/gbifference"
+import '@/assets/stylesheets/style.css'
 
-function discoverGbifference (selector?: string): Array<App> {
+function discoverGbifference (selector?: string): any[] {
   const tag: string = selector || '[data-gbifference="true"]'
   const elements: NodeListOf<HTMLElement> = document.querySelectorAll(tag)
   const elementsList: Array<HTMLElement> = [...elements]
 
-  return elementsList.map(element => 
+  return elementsList.map((element: HTMLElement) =>
     createGbifferenceWidget(element, parseElementOptions(element))
   )
 }
@@ -16,7 +17,7 @@ function autoDiscover (): void {
   discoverGbifference()
 }
 
-function parseDwcObject (dwcObjet: any): TOccurrence {
+function parseDwcObject (dwcObjet: any): IOccurrence {
   try {
     const json = JSON.parse(dwcObjet)
 
@@ -25,7 +26,6 @@ function parseDwcObject (dwcObjet: any): TOccurrence {
     throw('Invalid dwcObject')
   }
 }
-
 
 function parseElementOptions (element: HTMLElement): IConfiguration {
   return {
@@ -45,17 +45,20 @@ function createGbifferenceWidget (element: HTMLElement | string, opt: IConfigura
     throw 'Missing occurrenceID'
   }
 
-  return new GBifference({
-    occurrenceId,
+  return new TableGbifference(
     element,
-    source
-  })
+    {
+      occurrenceId,
+      element,
+      source
+    }
+  )
 }
 
 window.addEventListener('DOMContentLoaded', autoDiscover)
 
 export { 
-  createGbifferenceWidget,
+  TableGbifference,
   discoverGbifference,
-  GBifference
+  gbifference
 }
