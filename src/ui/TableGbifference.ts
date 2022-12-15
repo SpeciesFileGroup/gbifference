@@ -1,5 +1,5 @@
 import { TTableRow } from '@/types';
-import { ITable, IConfiguration } from "@/interfaces"
+import { ITable, ITableConfiguration } from "@/interfaces"
 import { EventEmitter } from "@/utils"
 import { makeTableObj } from '@/utils'
 import { EventList } from '@/constants'
@@ -13,7 +13,7 @@ export class TableGbifference extends EventEmitter {
     rows: []
   }
 
-  constructor (element: HTMLElement | string, options: IConfiguration) {
+  constructor (element: HTMLElement | string, options: ITableConfiguration) {
     super()
     this.element = typeof element === 'string' 
       ? document.querySelector(element) as HTMLElement
@@ -24,7 +24,7 @@ export class TableGbifference extends EventEmitter {
     }
 
     gbifference(options).then(data => {
-      this.table = makeTableObj(data)
+      this.table = makeTableObj(data, options)
       this.renderTable(this.element)
     })
   }

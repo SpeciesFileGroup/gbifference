@@ -7,6 +7,12 @@ export interface IConfiguration {
   source: ISource
 }
 
+export interface ITableConfiguration extends IConfiguration {
+  headers?: {
+    source?: string
+  }
+}
+
 export interface ISource {
   url?: string,
   parameters?: { [key: string]: string },

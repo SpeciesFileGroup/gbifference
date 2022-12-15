@@ -60,6 +60,9 @@ const DWC = {
 const table = new TableGbifference('#app', {
   source: {
     dwcObject: DWC
+  },
+  headers: {
+    source: 'Source (TaxonWorks)'
   }
 }) 
   
