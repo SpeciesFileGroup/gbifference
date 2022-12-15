@@ -58,7 +58,6 @@ const DWC = {
 }
 
 const table = new TableGbifference('#app', {
-  occurrenceId: 'urn:uuid:8f3fe604-8e36-4841-8c94-8e1a89b38273',
   source: {
     dwcObject: DWC
   }
