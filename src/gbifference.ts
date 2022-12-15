@@ -51,20 +51,20 @@ export default function (opt: IConfiguration) {
     interpreted: {}
   }
 
-  if (!opt.occurrenceId || (!opt.source.dwcObject && !opt.source.url)) {
+  if (!opt.occurrenceId && (!opt.source.dwcObject && !opt.source.url)) {
     throw('No source provided')
   }
 
   async function init ({ datasetKey, occurrenceId, source }: IConfiguration): Promise<IGbifferenceData> {
     const sourceOccurrence: IOccurrence = await getOccurrenceFromSource(source)
 
-    if (!opt.occurrenceId && !sourceOccurrence.occurrenceId) {
+    if (!opt.occurrenceId && !sourceOccurrence.occurrenceID) {
       throw('No occurrenceId')
     }
 
     const gbifOccurrence: IGbifOccurrence = await getGBIFOccurrence({
       datasetKey,
-      occurrenceId: occurrenceId || sourceOccurrence.occurrenceId as string
+      occurrenceId: occurrenceId || sourceOccurrence.occurrenceID as string
     })
 
     if (gbifOccurrence) {
