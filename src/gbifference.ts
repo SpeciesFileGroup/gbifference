@@ -39,6 +39,10 @@ function getDwcTermsFromOccurrences(dwcObjs: IOccurrence[]): string[] {
     ]
   })
 
+  terms = terms.filter(
+    term => dwcObjs.some(occurrence => occurrence[term])
+  )
+
   terms.sort()
 
   return [...new Set(terms)]
