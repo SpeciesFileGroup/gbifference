@@ -12,7 +12,7 @@ const DWC = {
   "coordinateUncertaintyInMeters": "100",
   "country": "Norway",
   "county": "Saltdal",
-  "datasetName": "Artsprosjekt_21-19_PROCTONOR II",
+  "datasetName": "Artsprosjekt_21-19_PROCTOOR II",
   "dateIdentified": null,
   "day": "08",
   "decimalLatitude": null,

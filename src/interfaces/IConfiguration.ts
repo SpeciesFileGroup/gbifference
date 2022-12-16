@@ -7,10 +7,12 @@ export interface IConfiguration {
   source: ISource
 }
 
+export interface ITableConfigurationHeaders {
+  source?: string
+}
+
 export interface ITableConfiguration extends IConfiguration {
-  headers?: {
-    source?: string
-  }
+  headers?: ITableConfigurationHeaders
 }
 
 export interface ISource {

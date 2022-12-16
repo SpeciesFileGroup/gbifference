@@ -1,4 +1,4 @@
-import { ITableConfiguration } from './../interfaces/IConfiguration';
+import { ITableConfiguration, ITableConfigurationHeaders } from './../interfaces/IConfiguration';
 import { IGbifferenceData, ITable } from "@/interfaces"
 import { TTableRow } from "@/types"
 import { OccurrenceRecord } from '@/constants'
@@ -8,15 +8,19 @@ enum ColumnTitle {
   interpreted = 'Interpreted (GBIF)',
 }
 
-function getHeaders (data: IGbifferenceData, sourceTitle: string | undefined): string[] {
+function getHeaders (
+  data: IGbifferenceData, 
+  headers: ITableConfigurationHeaders | undefined, 
+  hasRemarks: boolean
+  ): string[] {
   const { source, ...rest } = data.dwcRecords
-  const sourceHeader = sourceTitle || 'Source'
+  const sourceHeader = headers?.source || 'Source'
   const columns = data.inSync
     ? ['Term', `${sourceHeader} / ${ColumnTitle.original}`, ColumnTitle.interpreted]
     : ['Term', sourceHeader, ...Object.keys(rest).map((key: string) => ColumnTitle[key as keyof typeof ColumnTitle])]
 
-  if (data.remarks.length) {
-    columns.push('Remark')
+  if (hasRemarks) {
+    columns.push('Remarks')
   }
 
   return columns
@@ -33,7 +37,8 @@ function getOccurrenceRowValues (data: IGbifferenceData, term: string): TTableRo
 }
 
 export function makeTableObj (data: IGbifferenceData, opt: ITableConfiguration): ITable {
-  const headers: string[] = getHeaders(data, opt.headers?.source)
+  const hasRemarks = !!Object.keys(data.remarks).length
+  const headers: string[] = getHeaders(data, opt.headers, hasRemarks)
   const rows: TTableRow[][] = data.dwcTerms.map((term: string): TTableRow[] => { 
     const row: TTableRow[] = [term]
     
@@ -41,7 +46,7 @@ export function makeTableObj (data: IGbifferenceData, opt: ITableConfiguration):
       row.push(value)
     })
 
-    if (data.remarks.length) {
+    if (hasRemarks) {
       row.push(data.remarks[term])
     }
 
