@@ -1,1 +1,1 @@
-export type TOccurrence = string | number | null
+export type TOccurrence = string | number | null | Record<string, unknown> | unknown[]

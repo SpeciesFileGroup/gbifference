@@ -1,1 +1,1 @@
-export type TTableRow = string | number | null
+export type TTableRow = string | number | null | Record<string, unknown> | unknown[]
