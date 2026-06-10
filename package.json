@@ -1,8 +1,10 @@
 {
-  "name":  "@sfgrp/gbifference",
+  "name": "@sfgrp/gbifference",
   "private": false,
-  "version": "0.0.5",
-  "files": ["dist"],
+  "version": "0.0.6",
+  "files": [
+    "dist"
+  ],
   "main": "./dist/gbifference.umd.js",
   "module": "./dist/gbifference.es.js",
   "publishConfig": {
