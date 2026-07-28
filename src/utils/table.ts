@@ -1,7 +1,7 @@
 import { ITableConfiguration, ITableConfigurationHeaders } from './../interfaces/IConfiguration';
 import { IGbifferenceData, ITable } from "@/interfaces"
 import { TTableRow } from "@/types"
-import { OccurrenceRecord } from '@/constants'
+import { OccurrenceRecord, TableColumn } from '@/constants'
 
 enum ColumnTitle {
   original = 'Original (GBIF)',
@@ -16,11 +16,11 @@ function getHeaders (
   const { source, ...rest } = data.dwcRecords
   const sourceHeader = headers?.source || 'Source'
   const columns = data.inSync
-    ? ['Term', `${sourceHeader} / ${ColumnTitle.original}`, ColumnTitle.interpreted]
-    : ['Term', sourceHeader, ...Object.keys(rest).map((key: string) => ColumnTitle[key as keyof typeof ColumnTitle])]
+    ? [TableColumn.Term, `${sourceHeader} / ${ColumnTitle.original}`, ColumnTitle.interpreted]
+    : [TableColumn.Term, sourceHeader, ...Object.keys(rest).map((key: string) => ColumnTitle[key as keyof typeof ColumnTitle])]
 
   if (hasRemarks) {
-    columns.push('Remarks')
+    columns.push(TableColumn.Remarks)
   }
 
   return columns

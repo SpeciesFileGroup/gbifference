@@ -25,4 +25,31 @@ Navigate to the Local host in your browser.
 
 ### Native Javascript 
 
+## Styling
+
+The table exposes CSS classes so the host application can apply its own styles.
+
+| Class | Element |
+| --- | --- |
+| `.table-gbifference` | the `<table>` |
+| `.table-gbifference__json` | the `<pre>` wrapping a JSON value |
+| `.table-gbifference__remark-cell` | the `<td>` of the remarks column |
+| `.table-gbifference__remark` | the `<span>` wrapping the remark type |
+| `.table-gbifference__remark--inferred` | remark of an inferred value |
+| `.table-gbifference__remark--altered` | remark of an altered value |
+| `.table-gbifference__remark--excluded` | remark of an excluded value |
+
+```css
+.table-gbifference__remark {
+  display: inline-block;
+  padding: 0.15em 0.6em;
+  border-radius: 1em;
+  font-size: 0.85em;
+}
+
+.table-gbifference__remark--inferred { background-color: #E3F2FD; }
+.table-gbifference__remark--altered { background-color: #FFF8E1; }
+.table-gbifference__remark--excluded { background-color: #FFEBEE; }
+```
+
 

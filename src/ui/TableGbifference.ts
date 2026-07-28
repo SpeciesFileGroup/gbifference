@@ -2,9 +2,15 @@ import { TTableRow } from '@/types'
 import { ITable, ITableConfiguration } from '@/interfaces'
 import { EventEmitter } from '@/utils'
 import { makeTableObj } from '@/utils'
-import { EventList } from '@/constants'
+import { DifferenceType, EventList, TableColumn } from '@/constants'
 import { IEventClickCell } from '@/interfaces'
 import gbifference from '@/gbifference'
+
+const RemarkModifier: Record<DifferenceType, string> = {
+  [DifferenceType.Inferred]: 'inferred',
+  [DifferenceType.Altered]: 'altered',
+  [DifferenceType.Excluded]: 'excluded'
+}
 
 export class TableGbifference extends EventEmitter {
   element: HTMLElement
@@ -55,8 +61,15 @@ export class TableGbifference extends EventEmitter {
 
     data.forEach((value: TTableRow, index: number) => {
       const cellElement = document.createElement('td')
+      const isRemark = columns[index] === TableColumn.Remarks
 
-      cellElement.appendChild(this.renderValue(value))
+      if (isRemark) {
+        cellElement.classList.add('table-gbifference__remark-cell')
+      }
+
+      cellElement.appendChild(
+        isRemark ? this.renderRemark(value) : this.renderValue(value)
+      )
       rowElement.appendChild(cellElement)
 
       cellElement.addEventListener('click', (e) => {
@@ -72,6 +85,24 @@ export class TableGbifference extends EventEmitter {
     })
 
     return rowElement
+  }
+
+  renderRemark(value: TTableRow): Node {
+    const modifier = RemarkModifier[value as DifferenceType]
+
+    if (!modifier) {
+      return this.renderValue(value)
+    }
+
+    const remarkElement = document.createElement('span')
+
+    remarkElement.classList.add(
+      'table-gbifference__remark',
+      `table-gbifference__remark--${modifier}`
+    )
+    remarkElement.textContent = String(value)
+
+    return remarkElement
   }
 
   renderValue(value: unknown): Node {
